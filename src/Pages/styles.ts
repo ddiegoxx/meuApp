@@ -12,15 +12,6 @@ export const Container = styled.KeyboardAvoidingView`
   align-items: center;`
   ;
 
-export const Logo = styled.Image.attrs({
-  resizeMode: 'contain',
-})`
-  width: 60%;
-  align-self: center;
-  aspectRatio: 1;
-  margin: 16px 0 24px;
-`;
-
 export const AreaInput = styled.View`
   flex-direction: row;
   `;
@@ -47,12 +38,13 @@ align-items: center;
 
 export const SubmitText = styled.Text`
 font-size: 20px;
-color: #FFF;`;
-
-export const Link = styled.TouchableOpacity`
-margin-top: 10px;
-margin-bottom: 10px;
+color: #FFF;
 `;
-
-export const LinkText = styled.Text`
-color: #171717`;
+export const ErrorText = styled.Text`
+  color: #ff375b;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-left: 5px;
+  align-self: flex-start;
+  font-weight: 500;
+`;

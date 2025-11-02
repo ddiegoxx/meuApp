@@ -9,6 +9,7 @@ import {
   Input,
   SubmitButton,
   SubmitText,
+  ErrorText,
 } from './styles';
 
 type AuthStackParamList = {
@@ -22,93 +23,109 @@ export default function SignUp({ navigation }: Props) {
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
 
-  const isFormValid = () => {
-    return (
-      nome.trim().length >= 3 &&
-      email.includes('@') &&
-      email.includes('.') &&
-      password.length >= 6 &&
-      password === confirmPassword
-    );
-  };
-  const clearForm = () => {
-    setNome('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-  };
 
-  const handleSignUp = () => {
-    if (isFormValid()) {
-      console.log('Cadastrando usuário:');
-      Alert.alert("Cadastro realizado com sucesso!");
-      clearForm();
-      navigation.navigate('SignIn');
+  const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
+
+
+  const getErroCampo = (campo: string, valor: string) => {
+    switch (campo) {
+      case 'nome':
+        return valor.trim().length < 3 ? 'Nome deve ter 3+ caracteres' : '';
+      case 'email':
+        return !valor.includes('@') || !valor.includes('.') ? 'Email inválido' : '';
+      case 'senha':
+        return valor.length < 6 ? 'Senha deve ter 6+ caracteres' : '';
+      case 'confirmarSenha':
+        return valor !== senha ? 'Senhas não conferem' : '';
+      default:
+        return '';
     }
   };
 
+  const isFormularioValido = () => {
+    return (
+      getErroCampo('nome', nome) === '' &&
+      getErroCampo('email', email) === '' &&
+      getErroCampo('senha', senha) === '' &&
+      getErroCampo('confirmarSenha', confirmarSenha) === ''
+    );
+  };
+
+  const handleSignUp = () => {
+    setHasTriedSubmit(true);
+
+    if (isFormularioValido()) {
+      setNome('');
+      setEmail('');
+      setSenha('');
+      setConfirmarSenha('');
+      setHasTriedSubmit(false);
+      console.log('Usuário cadastrado:', { nome, email });
+      Alert.alert('Sucesso!', 'Cadastro realizado!');
+    }
+  };
+
+  const botaoDesabilitado = hasTriedSubmit ? !isFormularioValido() : false;
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      enabled
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Background>
         <Container>
           
-
           <AreaInput>
             <Input
               placeholder="Nome completo"
-              autoCorrect={false}
-              autoCapitalize="words"
               value={nome}
               onChangeText={setNome}
             />
+            {hasTriedSubmit && getErroCampo('nome', nome) ? (
+              <ErrorText>{getErroCampo('nome', nome)}</ErrorText>
+            ) : null}
           </AreaInput>
 
           <AreaInput>
             <Input
               placeholder="Email"
-              autoCorrect={false}
-              autoCapitalize="none"
               keyboardType="email-address"
               value={email}
               onChangeText={setEmail}
             />
+            {hasTriedSubmit && getErroCampo('email', email) ? (
+              <ErrorText>{getErroCampo('email', email)}</ErrorText>
+            ) : null}
           </AreaInput>
 
           <AreaInput>
             <Input
-              placeholder="Senha"
-              autoCorrect={false}
-              autoCapitalize="none"
-              secureTextEntry={true}
-              value={password}
-              onChangeText={setPassword}
+              placeholder="Senha (6+ caracteres)"
+              secureTextEntry
+              value={senha}
+              onChangeText={setSenha}
             />
+            {hasTriedSubmit && getErroCampo('senha', senha) ? (
+              <ErrorText>{getErroCampo('senha', senha)}</ErrorText>
+            ) : null}
           </AreaInput>
 
           <AreaInput>
             <Input
               placeholder="Confirmar senha"
-              autoCorrect={false}
-              autoCapitalize="none"
-              secureTextEntry={true}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
+              secureTextEntry
+              value={confirmarSenha}
+              onChangeText={setConfirmarSenha}
             />
+            {hasTriedSubmit && getErroCampo('confirmarSenha', confirmarSenha) ? (
+              <ErrorText>{getErroCampo('confirmarSenha', confirmarSenha)}</ErrorText>
+            ) : null}
           </AreaInput>
 
           <SubmitButton 
             onPress={handleSignUp}
-            disabled={!isFormValid()}
-            style={{
-              opacity: isFormValid() ? 1 : 0.6
-            }}
+            disabled={botaoDesabilitado}
+            style={{ opacity: botaoDesabilitado ? 0.6 : 1 }}
           >
             <SubmitText>Cadastrar</SubmitText>
           </SubmitButton>
